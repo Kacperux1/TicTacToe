@@ -17,7 +17,8 @@ MainWindow::MainWindow(QWidget *parent)
         {
             buttons[i][j] = new QPushButton(" ", this);
             board[i][j]= QSharedPointer<GameCell>::create();
-            board[i][j]->setButton(buttons[i][j]);            // Ustawienie pustego tekstu
+            board[i][j]->setButton(buttons[i][j]);
+            board[i][j]->changeImage("blank.png");   // Ustawienie pustego tekstu
             layout->addWidget(buttons[i][j], i, j);
 
             // Połączenie kliknięcia przycisku z metodą obsługi
@@ -42,6 +43,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleButtonClick(int i, int j) {
 
+    if(board[i][j]->getType() != CellType::blank)
+        return;
     if(turn==Turn::circle){
         board[i][j]->changeImage("kolko.png");
         turn=Turn::cross;
@@ -65,13 +68,14 @@ void MainWindow::checkEnd()
     CellType winner;
     for(int i=0;i<N;i++)
     {
+        horizontalCircles = 0;
+        horizontalCrosses = 0;
+        verticalCircles = 0;
+        verticalCrosses = 0;
         for(int j=0;j<N;j++){
-            horizontalCircles = 0;
-            horizontalCrosses = 0;
-            verticalCircles = 0;
-            verticalCrosses = 0;
+
             if(board[i][j]->getType() == CellType::blank)
-                continue;
+                break;
             else{
                 if(board[i][j]->getType() == CellType::cross)
                     horizontalCrosses++;
@@ -104,25 +108,45 @@ void MainWindow::checkEnd()
     */
     int diagonalCircles = 0;
     int diagonalCrosses = 0;
+    int diagonalCirclesReversed = 0;
+    int diagonalCrossesReversed = 0;
     for(int i=1;i<N;i++)
     {
         if(board[i][i]->getType() == CellType::blank)
             break;
         else
-            if(board[i][i]->getType() == board [i-1][i-1])
-                if(board[i][j]->getType() == CellType::cross)
+            if(board[i][i]->getType() == board [i-1][i-1]->getType())
+                if(board[i][i]->getType() == CellType::cross)
                     diagonalCrosses++;
                 else
-                    diagonalCrosses++;
+                    diagonalCircles++;
 
     }
-    if(diagonalCrosses == N && diagonalCircles ==N)
+    if(diagonalCrosses == N-1 || diagonalCircles ==N-1){
         gameOver=true;
-    if(gameOver)
-        continue;
-    else {
-        diagonalCrosses = 0;
-        diagonalCircles = 0;
+        if(diagonalCircles>diagonalCrosses)
+            winner = CellType::circle;
+        else
+            winner = CellType::cross;
+    }
+    if(!gameOver){
+    for(int i = 0;i < N;i++){
+            if(board[i][N-1-i]->getType() == CellType::blank)
+                break;
+            else
+                    if(board[i][N-1-i]->getType() == CellType::cross)
+                        diagonalCrossesReversed++;
+                    else
+                        diagonalCirclesReversed++;
+        }
+    }
+
+    if(diagonalCrossesReversed == N || diagonalCirclesReversed ==N){
+        gameOver=true;
+        if(diagonalCirclesReversed>diagonalCrossesReversed)
+            winner = CellType::circle;
+        else
+            winner = CellType::cross;
     }
     if(gameOver){
         QMessageBox endingMessage;
@@ -136,5 +160,20 @@ void MainWindow::checkEnd()
         endingMessage.exec();
         return;
     }
+    int blankFields=0;
+    for(int i=0;i<N;i++)
+        for(int j=0;j<N;j++)
+        {
+            if(board[i][j]->getType() == CellType::blank)
+                blankFields++;
+        }
+    if(blankFields == 0 && gameOver==false){
+        QMessageBox endingMessage;
+        endingMessage.setText("It's a draw!");
+        endingMessage.exec();
+        return;
+    }
+    return;
+
 }
 
