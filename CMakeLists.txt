@@ -26,7 +26,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 
 
         typedefs.h
-        gameboard.h gameboard.cpp
+
         gamecell.h gamecell.cpp
     )
 # Define target properties for Android with Qt 6 as:

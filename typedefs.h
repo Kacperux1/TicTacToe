@@ -1,7 +1,11 @@
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
-#include "gamecell.h"
+
+#include <iostream>
+
+const int N = 3;
+
 enum class CellType {
     blank=1,
     circle=2,
