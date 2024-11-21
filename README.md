@@ -6,7 +6,4 @@ Language: C++ 17
 GUI Framework : Qt
 
 build tools:
-MinGW / VSC
-
-Optional:
-QMake
+MinGW / VSC (also optional QMake)
