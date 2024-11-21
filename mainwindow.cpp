@@ -61,51 +61,49 @@ void MainWindow::handleButtonClick(int i, int j) {
 void MainWindow::checkEnd()
 {
     bool gameOver = false;
-    int horizontalCircles = 0;
-    int horizontalCrosses = 0;
-    int verticalCircles = 0;
-    int verticalCrosses = 0;
+    int circlesInRow = 0;
+    int crossesInRow = 0;
+    int circlesInColumn = 0;
+    int crossesInColumn = 0;
     CellType winner;
     for(int i=0;i<N;i++)
     {
-        horizontalCircles = 0;
-        horizontalCrosses = 0;
-        verticalCircles = 0;
-        verticalCrosses = 0;
-        for(int j=0;j<N;j++){
-
+        circlesInRow = 0;
+        crossesInRow = 0;
+        circlesInColumn = 0;
+        crossesInColumn = 0;
+        for(int j=0;j<N;j++) {
             if(board[i][j]->getType() == CellType::blank)
                 break;
             else{
                 if(board[i][j]->getType() == CellType::cross)
-                    horizontalCrosses++;
+                    crossesInRow++;
                 else
-                    horizontalCircles++;
-
-                if(board[j][i]->getType() == CellType::circle)
-                    verticalCrosses++;
-                else
-                    verticalCircles++;
+                    circlesInRow++;
             }
         }
-        if(horizontalCrosses == N || verticalCrosses == N){
+
+            for(int j = 0;j < N;j++) {
+                if(board[j][i]->getType() == CellType::blank)
+                    break;
+                if(board[j][i]->getType() == CellType::circle)
+                    circlesInColumn++;
+                else
+                    crossesInColumn++;
+            }
+
+        if(crossesInRow == N || crossesInColumn == N){
             gameOver = true;
             winner = CellType::cross;
             break;
         }
-        else if(horizontalCircles == N || verticalCircles == N){
+        else if(circlesInRow == N || circlesInColumn == N){
             gameOver = true;
             winner = CellType::circle;
             break;
         }
     }
 
-
-    /*if((!gameOver && board[N/2+1][N/2+1]->getType() != CellType::blank) && ((board[N/2+1][N/2+1]->getType() == board[0][0]->getType() && board[N/2+1][N/2+1]->getType() == board[N-1][N-1]->getType()) || (board[N/2+1][N/2+1]->getType() ==board[0][N-1]->getType() && board[N/2+1][N/2+1]->getType() == board[N-1][0]->getType()))){
-        gameOver = true;
-        winner = board[N/2+1][N/2+1]->getType();
-    }
-    */
     int diagonalCircles = 0;
     int diagonalCrosses = 0;
     int diagonalCirclesReversed = 0;
@@ -149,15 +147,16 @@ void MainWindow::checkEnd()
             winner = CellType::cross;
     }
     if(gameOver){
-        QMessageBox endingMessage;
+        QMessageBox winMessage;
         if(winner == CellType::circle){
-        endingMessage.setText("Game Over, the circle has won!");
+       winMessage.setText("Game Over, the circle has won!");
         }
         else
         {
-            endingMessage.setText("Game Over, the cross has won!");
+            winMessage.setText("Game Over, the cross has won!");
         }
-        endingMessage.exec();
+        winMessage.exec();
+        endMessage();
         return;
     }
     int blankFields=0;
@@ -168,12 +167,41 @@ void MainWindow::checkEnd()
                 blankFields++;
         }
     if(blankFields == 0 && gameOver==false){
-        QMessageBox endingMessage;
-        endingMessage.setText("It's a draw!");
-        endingMessage.exec();
+        QMessageBox winMessage;
+        winMessage.setText("It's a draw!");
+        winMessage.exec();
+        endMessage();
         return;
     }
     return;
-
 }
+
+void MainWindow::boardReInit()
+{
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j< N; j++){
+            board[i][j]->changeImage("blank.png");
+            board[i][j]->setType(CellType::blank);
+        }
+    }
+}
+
+void MainWindow::endMessage()
+{
+    QMessageBox endMessage;
+    endMessage.setText("Do you want to play again or exit the game?");
+
+    QPushButton *quitButton = endMessage.addButton("Quit", QMessageBox::RejectRole);
+    QPushButton *playAgainButton = endMessage.addButton("Play Again", QMessageBox::AcceptRole);
+
+    endMessage.exec();
+
+    if (endMessage.clickedButton() == quitButton) {
+        QApplication::quit();
+    } else if (endMessage.clickedButton() == playAgainButton) {
+        boardReInit();
+    }
+}
+
+
 

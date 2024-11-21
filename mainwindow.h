@@ -31,5 +31,7 @@ public:
 private slots:
     void handleButtonClick(int i, int j);
     void checkEnd();
+    void boardReInit();
+    void endMessage();
 };
 #endif // MAINWINDOW_H
